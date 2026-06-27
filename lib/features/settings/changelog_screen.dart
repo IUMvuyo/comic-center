@@ -276,7 +276,13 @@ class _ReleaseCardState extends State<_ReleaseCard> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: GestureDetector(
-                      onTap: () => UpdateService.openUrl(release.apkUrl!),
+                      // On Android open the APK asset directly; elsewhere
+                      // (iOS) open the release page in the browser.
+                      onTap: () => UpdateService.openUrl(
+                        UpdateService.supportsInAppUpdate
+                            ? release.apkUrl!
+                            : UpdateService.releaseUrl(release.tag),
+                      ),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
@@ -287,15 +293,19 @@ class _ReleaseCardState extends State<_ReleaseCard> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
-                              CupertinoIcons.arrow_down_to_line,
+                            Icon(
+                              UpdateService.supportsInAppUpdate
+                                  ? CupertinoIcons.arrow_down_to_line
+                                  : CupertinoIcons.arrow_up_right_square,
                               size: 14,
                               color: CupertinoColors.white,
                             ),
                             const SizedBox(width: 8),
-                            const Text(
-                              'Download APK',
-                              style: TextStyle(
+                            Text(
+                              UpdateService.supportsInAppUpdate
+                                  ? 'Download APK'
+                                  : 'View Release',
+                              style: const TextStyle(
                                 color: CupertinoColors.white,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
